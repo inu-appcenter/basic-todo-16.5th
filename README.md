@@ -34,6 +34,11 @@
     - REST API : Swagger
 
 ---
+## 🎓  기획자
+<a href="https://github.com/82everywin" style="margin-right: 20px;">
+      <img src="https://avatars.githubusercontent.com/u/109841880?v=4" width="100">
+    </a>
+
 
 ## 🔧  개발자
 <p>
@@ -53,5 +58,5 @@
 <i>🔥 **helper ~~(브랜치 이슈 해결)~~**</i>
 <p></p>
 <a href="https://github.com/squidjiny">
-<img src="https://avatars.githubusercontent.com/u/92552047?v=4" width="80">
+<img src="https://avatars.githubusercontent.com/u/92552047?v=4" width="60">
 </a>
