@@ -33,7 +33,7 @@ jobs:
         run : ./gradlew clean build --exclude-task test
 
       - name: Send file to the server
-        uses: appleboy/scp-action@server
+        uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
@@ -43,7 +43,7 @@ jobs:
           target: download
 
       - name: Deploy remote ssh commands using password
-        uses: appleboy/ssh-action@server
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
