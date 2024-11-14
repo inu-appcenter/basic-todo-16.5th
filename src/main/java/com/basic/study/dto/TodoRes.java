@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class TodoRes {
     private Long memberId;
+    private Long todoId;
     private String content;
     private LocalDate deadLine;
     @Builder.Default
