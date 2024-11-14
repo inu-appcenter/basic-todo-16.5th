@@ -28,7 +28,6 @@ public class TodoService {
         todoRepository.save(todo);
 
         return TodoRes.builder()
-                .memberId(todo.getMember().getId())
                 .todoId(todo.getId())
                 .content(todo.getContent())
                 .deadLine(todo.getDeadLine())
@@ -41,7 +40,6 @@ public class TodoService {
 
         for (Todo todo : todoList) {
             TodoRes todoRes = TodoRes.builder()
-                    .memberId(todo.getMember().getId())
                     .todoId(todo.getId())
                     .content(todo.getContent())
                     .deadLine(todo.getDeadLine())
@@ -57,7 +55,6 @@ public class TodoService {
         todo.update(todoUpdateReq);
         todoRepository.save(todo);
         return TodoRes.builder()
-                .memberId(todo.getMember().getId())
                 .todoId(todo.getId())
                 .content(todo.getContent())
                 .deadLine(todo.getDeadLine())
