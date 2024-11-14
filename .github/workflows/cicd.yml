@@ -24,11 +24,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Run build with Gradle Wrapper
-        run: ./gradlew clean build --exclude-task test
+      - name: Build with Gradle
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean build -x test
 
       - name: Send file to the server
         uses: appleboy/scp-action@v0.1.7
@@ -38,7 +37,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           source: "./build/libs/*.jar"
-          target: deploy-basic/download
+          target: download
 
       - name: Deploy remote ssh commands using password
         uses: appleboy/ssh-action@v1.1.0
