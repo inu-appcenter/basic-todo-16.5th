@@ -14,7 +14,10 @@ import java.util.NoSuchElementException;
 public class MemberService {
     private final MemberRepository memberRepository;
 
-    public MemberRes login(MemberReq memberReq) {
+    public MemberRes signup(MemberReq memberReq) {
+        // 이미 존재하는 회원
+        if (memberRepository.existsByEmail(memberReq.getEmail())) throw new NullPointerException();
+
         Member member = Member.builder()
                 .email(memberReq.getEmail())
                 .password(memberReq.getPassword())
@@ -22,7 +25,20 @@ public class MemberService {
         memberRepository.save(member);
         return MemberRes.builder()
                 .memberId(member.getId())
-                .email(memberReq.getEmail())
+                .email(member.getEmail())
+                .build();
+    }
+
+    public MemberRes login(MemberReq memberReq) {
+        Member member = memberRepository.findByEmail(memberReq.getEmail()).orElseThrow(
+                // 해당 회원 존재 X
+                NullPointerException::new
+        );
+        // 비밀번호 불일치
+        if (!memberReq.getPassword().equals(member.getPassword())) throw new NullPointerException();
+        return MemberRes.builder()
+                .memberId(member.getId())
+                .email(member.getEmail())
                 .build();
     }
 
@@ -36,9 +52,8 @@ public class MemberService {
     }
 
     public boolean deleteMember(Long memberId) {
-        if (!memberRepository.existsById(memberId)) return false;
-        Member member = memberRepository.findById(memberId).get();
-        memberRepository.delete(member);
+        if (!memberRepository.existsById(memberId)) throw new NullPointerException();
+        memberRepository.deleteById(memberId);
         return true;
     }
 

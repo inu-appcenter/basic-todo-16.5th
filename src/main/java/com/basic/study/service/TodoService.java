@@ -9,7 +9,6 @@ import com.basic.study.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,8 +17,8 @@ public class TodoService {
     final private MemberRepository memberRepository;
     final private TodoRepository todoRepository;
 
-    // CRUD
     public TodoRes createTodo(TodoReq todoReq) {
+        if(!memberRepository.existsById(todoReq.getMemberId())) throw new NullPointerException();
         Todo todo = Todo.builder()
                 .content(todoReq.getContent())
                 .deadLine(todoReq.getDeadLine())
@@ -34,24 +33,20 @@ public class TodoService {
                 .build();
     }
 
-    public List<TodoRes> readTodoes(Long memberId) {
-        List<Todo> todoList = todoRepository.findAllByMemberId(memberId);
-        ArrayList<TodoRes> todoResList = new ArrayList<>();
-
-        for (Todo todo : todoList) {
-            TodoRes todoRes = TodoRes.builder()
-                    .todoId(todo.getId())
-                    .content(todo.getContent())
-                    .deadLine(todo.getDeadLine())
-                    .isCompleted(todo.getIsCompleted())
-                    .build();
-            todoResList.add(todoRes);
-        }
-        return todoResList;
+    public List<TodoRes> readTodos(Long memberId) {
+        return todoRepository.findAllByMemberId(memberId).stream()
+                .map(todo -> TodoRes.builder()
+                        .todoId(todo.getId())
+                        .content(todo.getContent())
+                        .deadLine(todo.getDeadLine())
+                        .isCompleted(todo.getIsCompleted())
+                        .build()).toList();
     }
 
     public TodoRes updateTodo(Long todoId, TodoUpdateReq todoUpdateReq) {
-        Todo todo = todoRepository.findById(todoId).get();
+        Todo todo = todoRepository.findById(todoId).orElseThrow(
+                NullPointerException::new
+        );
         todo.update(todoUpdateReq);
         todoRepository.save(todo);
         return TodoRes.builder()
@@ -62,11 +57,23 @@ public class TodoService {
                 .build();
     }
 
+    public TodoRes toggleTodo(Long todoId) {
+        Todo todo = todoRepository.findById(todoId).orElseThrow(
+                NullPointerException::new
+        );
+        todo.toggle();
+        todoRepository.save(todo);
+        return TodoRes.builder()
+                .todoId(todo.getId())
+                .content(todo.getContent())
+                .deadLine(todo.getDeadLine())
+                .isCompleted(todo.getIsCompleted())
+                .build();
+    }
+
     public boolean deleteTodo(Long todoId) {
-        if (todoRepository.existsById(todoId)) {
-            todoRepository.deleteById(todoId);
-            return true;
-        }
-        return false;
+        if (!todoRepository.existsById(todoId)) throw new NullPointerException();
+        todoRepository.deleteById(todoId);
+        return true;
     }
 }

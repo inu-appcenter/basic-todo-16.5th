@@ -38,7 +38,10 @@ public class Todo {
     public void update(TodoUpdateReq todoReq) {
         this.content = todoReq.getContent();
         this.deadLine = todoReq.getDeadLine();
-        this.isCompleted = todoReq.getIsCompleted();
+    }
+
+    public void toggle() {
+        this.isCompleted = !this.isCompleted;
     }
 }
 
