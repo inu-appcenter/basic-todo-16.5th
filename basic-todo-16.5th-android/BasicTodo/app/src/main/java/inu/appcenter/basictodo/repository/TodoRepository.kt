@@ -21,9 +21,13 @@ interface TodoRepository {
         todoReq: TodoReq
     ) : Response<TodoRes>
 
-    suspend fun updateTodo(
+    suspend fun updateTodoContent(
         todoId: Long,
         updateTodoReq: UpdateTodoReq
+    ) : Response<TodoRes>
+
+    suspend fun updateTodoCompleted(
+        todoId: Long,
     ) : Response<TodoRes>
 
     suspend fun deleteTodo(

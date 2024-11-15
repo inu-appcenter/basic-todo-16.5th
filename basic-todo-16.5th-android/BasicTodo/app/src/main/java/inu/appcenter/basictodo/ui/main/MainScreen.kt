@@ -67,7 +67,7 @@ fun MainScreen(
                 )
                 Spacer(Modifier.height(25.dp))
                 Text(
-                    text = "${uiState.todoRes.count { !it.isCompleted }} tasks",
+                    text = "${uiState.todos.count { !it.isCompleted }} tasks",
                     style = TextStyle(
                         fontSize = 20.sp,
                         lineHeight = 20.sp,
@@ -115,7 +115,7 @@ fun MainScreen(
                 modifier = Modifier
                     .padding(top = 84.dp, start = 28.dp, end = 28.dp)
             ) {
-                if (uiState.todoRes.isEmpty()) {
+                if (uiState.todos.isEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -150,13 +150,13 @@ fun MainScreen(
                     }
                 } else {
                     LazyColumn{
-                        items(uiState.todoRes){ todo ->
+                        items(uiState.todos){ todo ->
                             TodoItem(
                                 modifier = Modifier,
                                 todoRes = todo ,
                                 mainViewModel = mainViewModel,
                                 onClick = {
-                                    mainViewModel.selectTodo(todo.memberId)
+                                    mainViewModel.selectTodo(todo)
                                     navController.navigate(AllDestination.EditTodo.route)
                                 }
                             )

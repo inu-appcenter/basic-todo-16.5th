@@ -11,7 +11,7 @@ import retrofit2.http.Path
 
 interface MemberRepository {
     suspend fun getMember(
-         memberId: Long
+        memberId: Long
     ) : Response<MemberRes>
 
     suspend fun deleteMember(
@@ -19,6 +19,10 @@ interface MemberRepository {
     ) : Response<Unit>
 
     suspend fun login(
+        memberReq: MemberReq
+    ) : Response<MemberRes>
+
+    suspend fun signup(
         memberReq: MemberReq
     ) : Response<MemberRes>
 }

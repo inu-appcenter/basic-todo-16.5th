@@ -94,4 +94,7 @@ dependencies {
 
     // Extended Icons
     implementation ("androidx.compose.material:material-icons-extended:1.7.5")
+
+    // Composable Sweet Toast
+    implementation ("com.github.GrenderG:Toasty:1.5.2")
 }

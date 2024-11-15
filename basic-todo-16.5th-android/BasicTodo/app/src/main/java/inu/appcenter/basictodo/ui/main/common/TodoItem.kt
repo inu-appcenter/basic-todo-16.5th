@@ -88,7 +88,7 @@ fun TodoItem(
             TodoCheckBox(
                 checked = todoRes.isCompleted,
                 onCheckedChange = {
-                    mainViewModel.updateTodoCompleted(todoRes, it)
+                    mainViewModel.updateTodoCompleted(todoRes)
                 },
                 modifier = Modifier
                     .padding(end = 16.dp)

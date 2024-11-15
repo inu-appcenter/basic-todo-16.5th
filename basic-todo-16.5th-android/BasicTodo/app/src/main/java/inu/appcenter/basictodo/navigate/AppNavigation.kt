@@ -16,7 +16,7 @@ import inu.appcenter.basictodo.ui.main.UpdateTodoScreen
 @Composable
 fun AppNavigation(
     authViewModel: AuthViewModel,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
 ) {
 
     val navController = rememberNavController()
@@ -29,13 +29,15 @@ fun AppNavigation(
         composable(AllDestination.Login.route) {
             LoginScreen(
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                mainViewModel = mainViewModel,
             )
         }
         composable(AllDestination.Signup.route) {
             SignupScreen(
                 navController = navController,
-                authViewModel = authViewModel
+                authViewModel = authViewModel,
+                mainViewModel = mainViewModel,
             )
         }
         composable(

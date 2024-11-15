@@ -238,18 +238,23 @@ fun AddTodoScreen(
                 Button(
                     onClick = {
                         // TODO: 추가 로직
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        mainViewModel.addTodo(
-                            title = title.text,
-                            date = finishDate
-                        )
-                        navController.popBackStack()
+                        if (title.text.isNotBlank() && finishDate != "종료 일자") {  // 내용과 날짜가 모두 설정되었는지 확인
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            mainViewModel.addTodo(
+                                content = title.text,
+                                deadLine = finishDate
+                            )
+                            navController.popBackStack()
+                        }
                     },
                     shape = RoundedCornerShape(10.dp),
+                    enabled = title.text.isNotBlank() && finishDate != "종료 일자",  // 조건 추가
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF034A9A),
-                        contentColor = Color.White
+                        contentColor = Color.White,
+                        disabledContainerColor = Color(0xFF034A9A).copy(alpha = 0.5f),  // 비활성화 색상
+                        disabledContentColor = Color.White.copy(alpha = 0.5f)  // 비활성화 텍스트 색상
                     ),
                     modifier = Modifier
                         .padding(vertical = 16.dp, horizontal = 100.dp)

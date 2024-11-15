@@ -127,7 +127,7 @@ fun UpdateTodoScreen(
                     modifier = Modifier
                         .padding(end = 40.dp)
                         .clickable {
-                            mainViewModel.deleteTodo(id = selectedTodo.memberId)
+                            mainViewModel.deleteTodo(selectedTodoRes = selectedTodo)
                             navController.popBackStack()
                         }
                 )
@@ -228,19 +228,28 @@ fun UpdateTodoScreen(
             ) {
                 Button(
                     onClick = {
-                        keyboardController?.hide()
-                        focusManager.clearFocus()
-                        mainViewModel.updateTodo(
-                            id = selectedTodo.memberId,
-                            title = title.text,
-                            finishDate = finishDate,
-                        )
-                        navController.popBackStack()
+                        if (title.text != selectedTodo.content || finishDate != selectedTodo.deadLine) {
+                            keyboardController?.hide()
+                            focusManager.clearFocus()
+                            mainViewModel.updateTodo(
+                                selectedTodoRes = selectedTodo,
+                                content = title.text,
+                                deadLine = finishDate,
+                            )
+                            navController.popBackStack()
+                        } else {
+                            // 변경사항이 없으면 그냥 뒤로가기
+                            navController.popBackStack()
+                        }
                     },
                     shape = RoundedCornerShape(10.dp),
+                    enabled = title.text.isNotBlank() &&
+                            (title.text != selectedTodo.content || finishDate != selectedTodo.deadLine),  // 조건 추가
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF034A9A),
-                        contentColor = Color.White
+                        contentColor = Color.White,
+                        disabledContainerColor = Color(0xFF034A9A).copy(alpha = 0.5f),  // 비활성화 색상
+                        disabledContentColor = Color.White.copy(alpha = 0.5f)  // 비활성화 텍스트 색상
                     ),
                     modifier = Modifier
                         .padding(vertical = 16.dp, horizontal = 100.dp)

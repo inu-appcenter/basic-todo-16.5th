@@ -1,8 +1,10 @@
 package inu.appcenter.basictodo.ui.auth
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import inu.appcenter.basictodo.model.MemberReq
+import inu.appcenter.basictodo.model.MemberRes
 import inu.appcenter.basictodo.repository.MemberRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,15 +16,11 @@ data class AuthUiState(
     val loginPassword: String = "",
     val signupEmail: String = "",
     val signupPassword: String = "",
+    val member: MemberRes = MemberRes(memberId = 0, email = ""),
     val isLoading: Boolean = false,
     val error: String? = null,
     val isLoggedIn: Boolean = false
 )
-
-sealed class AuthResult {
-    object Success : AuthResult()
-    data class Error(val message: String) : AuthResult()
-}
 
 class AuthViewModel(private val memberRepository: MemberRepository) : ViewModel() {
 
@@ -43,10 +41,13 @@ class AuthViewModel(private val memberRepository: MemberRepository) : ViewModel(
                 )
 
                 if (response.isSuccessful) {
-                    response.body()?.let {
+                    response.body()?.let { memberRes ->
                         _uiState.value = _uiState.value.copy(
                             loginEmail = "",
                             loginPassword = "",
+                            signupEmail = "",
+                            signupPassword = "",
+                            member = memberRes,
                             isLoggedIn = true
                         )
                     }
@@ -67,7 +68,7 @@ class AuthViewModel(private val memberRepository: MemberRepository) : ViewModel(
                 setLoading(true)
                 clearError()
 
-                val response = memberRepository.login(  // Changed from login to signup
+                val response = memberRepository.signup(  // Changed from login to signup
                     MemberReq(
                         email = _uiState.value.signupEmail,
                         password = _uiState.value.signupPassword
@@ -75,10 +76,13 @@ class AuthViewModel(private val memberRepository: MemberRepository) : ViewModel(
                 )
 
                 if (response.isSuccessful) {
-                    response.body()?.let {
+                    response.body()?.let { memberRes ->
                         _uiState.value = _uiState.value.copy(
+                            loginEmail = "",
+                            loginPassword = "",
                             signupEmail = "",
                             signupPassword = "",
+                            member = memberRes,
                             isLoggedIn = true
                         )
                     }

@@ -1,5 +1,6 @@
 package inu.appcenter.basictodo.ui.auth
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -29,21 +31,27 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import es.dmoral.toasty.Toasty
 import inu.appcenter.basictodo.R
 import inu.appcenter.basictodo.navigate.AllDestination
 import inu.appcenter.basictodo.ui.auth.common.LoginTextField
+import inu.appcenter.basictodo.ui.main.MainViewModel
 import inu.appcenter.basictodo.ui.theme.fontFamilyRoboto
 
 
 @Composable
 fun SignupScreen(
     navController: NavController,
-    authViewModel: AuthViewModel
+    authViewModel: AuthViewModel,
+    mainViewModel: MainViewModel,
 ){
     val uiState by authViewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) {
+            mainViewModel.setMember(uiState.member)  // member 정보 전달
+            Toasty.success(context, "회원가입 성공!", Toast.LENGTH_SHORT, true).show();
             navController.navigate(AllDestination.Main.route) {
                 popUpTo(AllDestination.Login.route) { inclusive = true }
             }
@@ -86,7 +94,6 @@ fun SignupScreen(
         Button(
             onClick = {
                 authViewModel.signup()
-
             },
             shape = RoundedCornerShape(10.dp),
             colors = ButtonDefaults.buttonColors(

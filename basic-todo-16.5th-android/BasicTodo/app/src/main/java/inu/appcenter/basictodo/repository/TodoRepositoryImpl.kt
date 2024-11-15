@@ -15,9 +15,17 @@ class TodoRepositoryImpl(private val apiService: APIService): TodoRepository {
         return apiService.addTodo(todoReq)
     }
 
-    override suspend fun updateTodo(todoId: Long, updateTodoReq: UpdateTodoReq): Response<TodoRes> {
-        return apiService.updateTodo(todoId, updateTodoReq)
+    override suspend fun updateTodoContent(
+        todoId: Long,
+        updateTodoReq: UpdateTodoReq
+    ): Response<TodoRes> {
+        return apiService.updateTodoContent(todoId, updateTodoReq)
     }
+
+    override suspend fun updateTodoCompleted(todoId: Long): Response<TodoRes> {
+        return apiService.updateTodoCompleted(todoId)
+    }
+
 
     override suspend fun deleteTodo(todoId: Long): Response<Unit> {
         return apiService.deleteTodo(todoId)

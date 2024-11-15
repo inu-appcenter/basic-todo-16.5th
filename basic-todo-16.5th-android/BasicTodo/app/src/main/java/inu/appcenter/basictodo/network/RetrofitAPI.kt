@@ -12,7 +12,7 @@ class RetrofitAPI() : KoinComponent {
 
     var gson= GsonBuilder().setLenient().create()
 
-    private val BASE_URL = "https://bjj.inuappcenter.kr/"
+    private val BASE_URL = "http://na2ru2.me:6320/"
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

@@ -16,10 +16,10 @@ import kotlinx.coroutines.launch
 
 data class MainUiState(
     val member: MemberRes = MemberRes(memberId = 0, email = ""),
-    val todoRes: List<TodoRes> = emptyList(),
+    val todos: List<TodoRes> = emptyList(),
+    val selectedTodoRes: TodoRes? = null,
     val isLoading: Boolean = false,
     val error: String? = null,
-    val selectedTodoRes: TodoRes? = null
 )
 
 class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
@@ -28,6 +28,11 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
+        getTodos()
+    }
+
+    fun setMember(member: MemberRes) {
+        _uiState.update { it.copy(member = member) }
         getTodos()
     }
 
@@ -40,7 +45,7 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
                 val response = todoRepository.getTodos(memberId = uiState.value.member.memberId)
                 if (response.isSuccessful) {
                     response.body()?.let { todos ->
-                        _uiState.update { it.copy(todoRes = todos) }
+                        _uiState.update { it.copy(todos = todos) }
                     }
                 } else {
                     handleError("Failed to fetch todos: ${response.message()}")
@@ -53,25 +58,19 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
         }
     }
 
-    fun selectTodo(id: Long) {
-        val selectedTodo = _uiState.value.todoRes.find { it.memberId == id }
-        _uiState.update { it.copy(selectedTodoRes = selectedTodo) }
+    fun selectTodo(todo: TodoRes) {
+        _uiState.update { it.copy(selectedTodoRes = todo) }
     }
 
-    fun updateTodoCompleted(selectedTodoRes: TodoRes, isCompleted: Boolean) {
+    fun updateTodoCompleted(selectedTodoRes: TodoRes) {
         viewModelScope.launch {
             try {
                 setLoading(true)
                 clearError()
 
                 // 현재 Todo 찾기
-                val response = todoRepository.updateTodo(
-                    selectedTodoRes.memberId,
-                    UpdateTodoReq(
-                        content = selectedTodoRes.content,  // 기존 내용 유지
-                        deadLine = selectedTodoRes.deadLine,  // 기존 마감일 유지
-                        isCompleted = isCompleted  // 완료 상태만 업데이트
-                    )
+                val response = todoRepository.updateTodoCompleted(
+                    selectedTodoRes.todoId
                 )
                 if (response.isSuccessful) {
                     getTodos()
@@ -86,13 +85,13 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
         }
     }
 
-    fun deleteTodo(id: Long) {
+    fun deleteTodo(selectedTodoRes: TodoRes) {
         viewModelScope.launch {
             try {
                 setLoading(true)
                 clearError()
 
-                val response = todoRepository.deleteTodo(id)
+                val response = todoRepository.deleteTodo(selectedTodoRes.todoId)
                 if (response.isSuccessful) {
                     getTodos()
                 } else {
@@ -106,7 +105,7 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
         }
     }
 
-    fun addTodo(title: String, date: String) {
+    fun addTodo(content: String, deadLine: String) {
         viewModelScope.launch {
             try {
                 setLoading(true)
@@ -115,8 +114,8 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
                 val response = todoRepository.addTodo(
                     TodoReq(
                         memberId = uiState.value.member.memberId,
-                        content = title,
-                        deadLine = date
+                        content = content,
+                        deadLine = deadLine
                     )
                 )
                 if (response.isSuccessful) {
@@ -132,18 +131,17 @@ class MainViewModel(private val todoRepository: TodoRepository) : ViewModel() {
         }
     }
 
-    fun updateTodo(id: Long, title: String, finishDate: String) {
+    fun updateTodo(selectedTodoRes: TodoRes, content: String, deadLine: String) {
         viewModelScope.launch {
             try {
                 setLoading(true)
                 clearError()
 
-                val response = todoRepository.updateTodo(
-                    id,
-                    UpdateTodoReq(
-                        content = title,
-                        deadLine = finishDate,
-                        isCompleted = false
+                val response = todoRepository.updateTodoContent(
+                    todoId = selectedTodoRes.todoId,
+                    updateTodoReq = UpdateTodoReq(
+                        content = content,
+                        deadLine = deadLine,
                     )
                 )
                 if (response.isSuccessful) {

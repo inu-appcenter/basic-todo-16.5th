@@ -17,4 +17,8 @@ class MemberRepositoryImpl(private val apiService: APIService) : MemberRepositor
     override suspend fun login(memberReq: MemberReq): Response<MemberRes> {
         return apiService.login(memberReq)
     }
+
+    override suspend fun signup(memberReq: MemberReq): Response<MemberRes> {
+        return apiService.signup(memberReq)
+    }
 }

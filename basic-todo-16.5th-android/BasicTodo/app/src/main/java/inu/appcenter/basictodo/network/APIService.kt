@@ -9,9 +9,11 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 interface APIService {
@@ -19,7 +21,7 @@ interface APIService {
     // TODO
     @GET("/api/todos")
     suspend fun getTodos(
-        memberId: Long
+        @Query("memberId") memberId: Long
     ) : Response<List<TodoRes>>
 
     @POST("/api/todos")
@@ -28,9 +30,14 @@ interface APIService {
     ) : Response<TodoRes>
 
     @PUT("/api/todos/{todoId}")
-    suspend fun updateTodo(
+    suspend fun updateTodoContent(
         @Path("todoId") todoId: Long,
         @Body updateTodoReq: UpdateTodoReq
+    ) : Response<TodoRes>
+
+    @PATCH("/api/todos/{todoId}")
+    suspend fun updateTodoCompleted(
+        @Path("todoId") todoId: Long,
     ) : Response<TodoRes>
 
     @DELETE("/api/todos/{todoId}")
@@ -51,6 +58,11 @@ interface APIService {
 
     @POST("/api/members/login")
     suspend fun login(
+        @Body memberReq: MemberReq
+    ) : Response<MemberRes>
+
+    @POST("/api/members/signup")
+    suspend fun signup(
         @Body memberReq: MemberReq
     ) : Response<MemberRes>
 }
