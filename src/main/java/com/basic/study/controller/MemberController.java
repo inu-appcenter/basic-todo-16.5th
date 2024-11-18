@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/members")
@@ -41,6 +43,11 @@ public class MemberController {
     @ApiResponse(responseCode = "500", description = "존재하지 않는 회원")
     public ResponseEntity<MemberRes> getMember(@PathVariable Long memberId) {
         return ResponseEntity.ok(memberService.getMember(memberId));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<List<MemberRes>> getMembers() {
+        return ResponseEntity.ok(memberService.getMembers());
     }
 
     @DeleteMapping("/{memberId}")

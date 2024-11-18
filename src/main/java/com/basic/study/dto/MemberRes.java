@@ -14,4 +14,7 @@ public class MemberRes {
     private Long memberId;
     @Schema(description = "회원의 email", example = "asdf")
     private String email;
+    @Builder.Default
+    @Schema(description = "회원의 password (전체회원 조회시 사용)", example = "asdf")
+    private String password="private";
 }

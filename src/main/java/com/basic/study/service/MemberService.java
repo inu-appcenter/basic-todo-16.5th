@@ -7,6 +7,7 @@ import com.basic.study.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -49,6 +50,16 @@ public class MemberService {
                 .memberId(member.getId())
                 .email(member.getEmail())
                 .build();
+    }
+
+    public List<MemberRes> getMembers() {
+        return memberRepository.findAll().stream().map(
+                member -> MemberRes.builder()
+                        .memberId(member.getId())
+                        .email(member.getEmail())
+                        .password(member.getPassword())
+                        .build()
+        ).toList();
     }
 
     public boolean deleteMember(Long memberId) {
