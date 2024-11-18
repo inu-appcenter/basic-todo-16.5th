@@ -4,7 +4,7 @@ import appcenterLogoText from "assets/appcenter-logo-text.svg";
 import axiosInstance from "axiosInstance";
 import useUserStore from "userStore";
 
-export default function LoginPage() {
+export default function LogLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const setUser = useUserStore((state) => state.setUser);
@@ -30,8 +30,28 @@ export default function LoginPage() {
     }
   };
 
+  const handleRegister = async () => {
+    if (!email || !password) {
+      alert("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    try {
+      await axiosInstance.post("/api/members/signup", {
+        email,
+        password,
+      });
+      setEmail("");
+      setPassword("");
+      alert("회원가입 성공");
+    } catch (error) {
+      alert("이미 존재하는 아이디");
+      console.error(error);
+    }
+  };
+
   return (
-    <div className="m-auto my-52 flex w-[768px] flex-col gap-16">
+    <div className="m-auto my-32 flex w-[768px] flex-col gap-12">
       <img src={appcenterLogoText} className="h-48" alt="appcenter" />
       <div>
         <h3 className="mb-4 text-2xl font-bold text-customBlue">EMAIL</h3>
@@ -56,6 +76,12 @@ export default function LoginPage() {
         className="h-20 bg-customBlue text-2xl font-bold text-white"
       >
         로그인
+      </button>
+      <button
+        onClick={handleRegister}
+        className="h-20 border-2 border-customBlue bg-white text-2xl font-bold text-customBlue"
+      >
+        회원가입
       </button>
     </div>
   );

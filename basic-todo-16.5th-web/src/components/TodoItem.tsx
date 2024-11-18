@@ -23,13 +23,11 @@ export default function TodoItem({ todo, onDelete }: TodoItemProps) {
 
   const handleCheckboxChange = async () => {
     try {
-      await axiosInstance.put(`/api/todos/${todo.todoId}`, {
-        content,
-        deadLine,
-        isCompleted: !isChecked,
-      });
-      setIsChecked(!isChecked);
+      const response = await axiosInstance.patch(`/api/todos/${todo.todoId}`);
+      setIsChecked(response.data.isCompleted);
+      console.log("체크 성공");
     } catch (error) {
+      alert("체크 실패");
       console.error(error);
     }
   };
@@ -39,12 +37,20 @@ export default function TodoItem({ todo, onDelete }: TodoItemProps) {
       await axiosInstance.put(`/api/todos/${todo.todoId}`, {
         content,
         deadLine,
-        isCompleted: isChecked,
       });
       setIsEditing(false);
+      console.log("수정 성공");
     } catch (error) {
+      alert("수정 실패");
       console.error(error);
     }
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+    setContent(todo.content);
+    setDeadLine(todo.deadLine);
+    console.log("수정 취소");
   };
 
   return (
@@ -110,26 +116,36 @@ export default function TodoItem({ todo, onDelete }: TodoItemProps) {
       </div>
       <div className="flex gap-4">
         {isEditing ? (
-          <button
-            onClick={handleEdit}
-            className="h-11 w-11 rounded-3xl bg-customSky"
-          >
-            완료
-          </button>
+          <>
+            <button
+              onClick={handleEdit}
+              className="h-11 w-11 rounded-3xl bg-customSky"
+            >
+              완료
+            </button>
+            <button
+              onClick={handleCancel}
+              className="h-11 w-11 rounded-3xl bg-customSky"
+            >
+              취소
+            </button>
+          </>
         ) : (
-          <span
-            onClick={() => setIsEditing(true)}
-            className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-3xl bg-customSky"
-          >
-            <img src={pencil} className="h-6 w-6" alt="수정" />
-          </span>
+          <>
+            <span
+              onClick={() => setIsEditing(true)}
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-3xl bg-customSky"
+            >
+              <img src={pencil} className="h-6 w-6" alt="수정" />
+            </span>
+            <span
+              onClick={onDelete}
+              className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-3xl bg-customSky"
+            >
+              <img src={trashCan} className="h-6 w-6" alt="삭제" />
+            </span>
+          </>
         )}
-        <span
-          onClick={onDelete}
-          className="flex h-11 w-11 cursor-pointer items-center justify-center rounded-3xl bg-customSky"
-        >
-          <img src={trashCan} className="h-6 w-6" alt="삭제" />
-        </span>
       </div>
     </div>
   );

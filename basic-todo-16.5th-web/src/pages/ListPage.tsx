@@ -37,7 +37,9 @@ export default function ListPage() {
       setTodos((prevTodos) =>
         prevTodos.filter((todo) => todo.todoId !== todoId),
       );
+      console.log("삭제 성공");
     } catch (error) {
+      alert("삭제 실패");
       console.error(error);
     }
   };
