@@ -5,7 +5,7 @@ on:
     branches: [ "server" ]
 
 jobs:
-  build:
+  build_and_push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -35,12 +35,24 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/todo:latest .
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image for ARM64
+        run: |
+          docker buildx build \
+            --platform linux/arm64 \
+            --tag ${{ secrets.DOCKER_USERNAME }}/todo:latest \
+            --output type=docker \
+            .
 
       - name: Push Docker image to Docker Hub
         run: docker push ${{ secrets.DOCKER_USERNAME }}/todo:latest
 
+  deploy:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy to App Center Server
         uses: appleboy/ssh-action@master
         with:
@@ -51,14 +63,14 @@ jobs:
           script: |
             cd /home/ubuntu
             docker pull ${{ secrets.DOCKER_USERNAME }}/todo:latest
-            
+
             echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
-            
+
             if [ "$(docker ps -aq -f name=todo)" ]; then
               docker stop todo
               docker rm todo
             fi
-            
+
             docker run -d \
               --name todo \
               -p 8080:8080 \
