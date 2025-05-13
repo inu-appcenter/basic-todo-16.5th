@@ -17,9 +17,9 @@ jobs:
           distribution: 'temurin'
           
       - run: mkdir ./src/main/resources
-      - run: touch ./src/main/resources/application.properties
-      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-      - run: cat ./src/main/resources/application.properties
+      - run: touch ./src/main/resources/application-prod.yml
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application-prod.yml
+      - run: cat ./src/main/resources/application-prod.yml
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -27,25 +27,40 @@ jobs:
       - name: Build with Gradle
         run: |
           chmod +x ./gradlew
-          ./gradlew clean build -x test
+          ./gradlew clean build -x test -i --no-daemon -Dspring.profiles.active=prod
 
-      - name: Send file to the server
-        uses: appleboy/scp-action@v0.1.7
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/todo:latest .
+
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/todo:latest
+
+      - name: Deploy to App Center Server
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
-          source: "./build/libs/*.jar"
-          target: download
-
-      - name: Deploy remote ssh commands using password
-        uses: appleboy/ssh-action@v1.1.0
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          password: ${{ secrets.PASSWORD }}
-          port: ${{ secrets.PORT }}
-          script_stop: true
           script: |
-            sh deploy-basic/deploy.sh
+            cd /home/ubuntu
+            docker pull ${{ secrets.DOCKER_USERNAME }}/todo:latest
+            
+            echo "DOCKER_USERNAME=${{ secrets.DOCKER_USERNAME }}" > .env
+            
+            if [ "$(docker ps -aq -f name=todo)" ]; then
+              docker stop todo
+              docker rm todo
+            fi
+            
+            docker run -d \
+              --name todo \
+              -p 8080:8080 \
+              -e SPRING_PROFILES_ACTIVE=prod \
+              ${{ secrets.DOCKER_USERNAME }}/todo:latest
