@@ -42,3 +42,4 @@ application-prod.properties
 
 
 application.yml
+docker-compose.yml
